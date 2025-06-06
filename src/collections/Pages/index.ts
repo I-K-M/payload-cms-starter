@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated } from '../../access/authenticated'
+import { hasRole } from '../../access/hasRole'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Archive } from '../../blocks/ArchiveBlock/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
@@ -24,10 +24,10 @@ import {
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
   access: {
-    create: authenticated,
-    delete: authenticated,
+    create: hasRole(['admin', 'editor']),
+    delete: hasRole(['admin']),
     read: authenticatedOrPublished,
-    update: authenticated,
+    update: hasRole(['admin', 'editor']),
   },
   // This config controls what's populated by default when a page is referenced
   // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
@@ -99,13 +99,97 @@ export const Pages: CollectionConfig<'pages'> = {
             MetaImageField({
               relationTo: 'media',
             }),
-
             MetaDescriptionField({}),
+            {
+              name: 'keywords',
+              type: 'text',
+              label: 'Keywords',
+              admin: {
+                description: 'Separate keywords with commas',
+              },
+            },
+            {
+              name: 'robots',
+              type: 'group',
+              label: 'Robots Directives',
+              fields: [
+                {
+                  name: 'index',
+                  type: 'checkbox',
+                  label: 'Index page',
+                  defaultValue: true,
+                },
+                {
+                  name: 'follow',
+                  type: 'checkbox',
+                  label: 'Follow links',
+                  defaultValue: true,
+                },
+                {
+                  name: 'noimageindex',
+                  type: 'checkbox',
+                  label: 'Do not index images',
+                  defaultValue: false,
+                },
+              ],
+            },
+            {
+              name: 'social',
+              type: 'group',
+              label: 'Social Media',
+              fields: [
+                {
+                  name: 'twitter',
+                  type: 'group',
+                  label: 'Twitter',
+                  fields: [
+                    {
+                      name: 'card',
+                      type: 'select',
+                      label: 'Card type',
+                      options: [
+                        { label: 'Summary', value: 'summary' },
+                        { label: 'Summary with large image', value: 'summary_large_image' },
+                        { label: 'App', value: 'app' },
+                        { label: 'Player', value: 'player' },
+                      ],
+                      defaultValue: 'summary_large_image',
+                    },
+                    {
+                      name: 'creator',
+                      type: 'text',
+                      label: 'Creator @username',
+                    },
+                  ],
+                },
+                {
+                  name: 'og',
+                  type: 'group',
+                  label: 'Open Graph',
+                  fields: [
+                    {
+                      name: 'type',
+                      type: 'select',
+                      label: 'Content type',
+                      options: [
+                        { label: 'Website', value: 'website' },
+                        { label: 'Article', value: 'article' },
+                        { label: 'Profile', value: 'profile' },
+                        { label: 'Book', value: 'book' },
+                      ],
+                      defaultValue: 'website',
+                    },
+                    {
+                      name: 'siteName',
+                      type: 'text',
+                      label: 'Site name',
+                    },
+                  ],
+                },
+              ],
+            },
             PreviewField({
-              // if the `generateUrl` function is configured
               hasGenerateFn: true,
-
-              // field paths to match the target field for data
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
             }),

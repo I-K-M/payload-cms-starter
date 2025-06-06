@@ -199,6 +199,25 @@ export interface Page {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * Separate keywords with commas
+     */
+    keywords?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+      noimageindex?: boolean | null;
+    };
+    social?: {
+      twitter?: {
+        card?: ('summary' | 'summary_large_image' | 'app' | 'player') | null;
+        creator?: string | null;
+      };
+      og?: {
+        type?: ('website' | 'article' | 'profile' | 'book') | null;
+        siteName?: string | null;
+      };
+    };
   };
   publishedAt?: string | null;
   slug?: string | null;
@@ -239,6 +258,33 @@ export interface Post {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * Separate keywords with commas
+     */
+    keywords?: string | null;
+    robots?: {
+      index?: boolean | null;
+      follow?: boolean | null;
+      noimageindex?: boolean | null;
+    };
+    social?: {
+      twitter?: {
+        card?: ('summary' | 'summary_large_image' | 'app' | 'player') | null;
+        creator?: string | null;
+      };
+      og?: {
+        type?: ('website' | 'article' | 'profile' | 'book') | null;
+        siteName?: string | null;
+        publishedTime?: string | null;
+        modifiedTime?: string | null;
+        author?: string | null;
+        section?: string | null;
+        /**
+         * Separate tags with commas
+         */
+        tag?: string | null;
+      };
+    };
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
@@ -374,6 +420,7 @@ export interface Category {
 export interface User {
   id: string;
   name?: string | null;
+  role: 'admin' | 'editor' | 'user';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1025,6 +1072,30 @@ export interface PagesSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        keywords?: T;
+        robots?:
+          | T
+          | {
+              index?: T;
+              follow?: T;
+              noimageindex?: T;
+            };
+        social?:
+          | T
+          | {
+              twitter?:
+                | T
+                | {
+                    card?: T;
+                    creator?: T;
+                  };
+              og?:
+                | T
+                | {
+                    type?: T;
+                    siteName?: T;
+                  };
+            };
       };
   publishedAt?: T;
   slug?: T;
@@ -1133,6 +1204,35 @@ export interface PostsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        keywords?: T;
+        robots?:
+          | T
+          | {
+              index?: T;
+              follow?: T;
+              noimageindex?: T;
+            };
+        social?:
+          | T
+          | {
+              twitter?:
+                | T
+                | {
+                    card?: T;
+                    creator?: T;
+                  };
+              og?:
+                | T
+                | {
+                    type?: T;
+                    siteName?: T;
+                    publishedTime?: T;
+                    modifiedTime?: T;
+                    author?: T;
+                    section?: T;
+                    tag?: T;
+                  };
+            };
       };
   publishedAt?: T;
   authors?: T;
@@ -1267,6 +1367,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

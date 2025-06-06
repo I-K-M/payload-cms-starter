@@ -9,7 +9,7 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { authenticated } from '../../access/authenticated'
+import { hasRole } from '@/access/hasRole'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
@@ -30,10 +30,10 @@ import { slugField } from '@/fields/slug'
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
   access: {
-    create: authenticated,
-    delete: authenticated,
+    create: hasRole(['admin', 'editor']),
+    delete: hasRole(['admin']),
     read: authenticatedOrPublished,
-    update: authenticated,
+    update: hasRole(['admin', 'editor']),
   },
   // This config controls what's populated by default when a post is referenced
   // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
@@ -150,13 +150,135 @@ export const Posts: CollectionConfig<'posts'> = {
             MetaImageField({
               relationTo: 'media',
             }),
-
             MetaDescriptionField({}),
+            {
+              name: 'keywords',
+              type: 'text',
+              label: 'Keywords',
+              admin: {
+                description: 'Separate keywords with commas',
+              },
+            },
+            {
+              name: 'robots',
+              type: 'group',
+              label: 'Robots Directives',
+              fields: [
+                {
+                  name: 'index',
+                  type: 'checkbox',
+                  label: 'Index page',
+                  defaultValue: true,
+                },
+                {
+                  name: 'follow',
+                  type: 'checkbox',
+                  label: 'Follow links',
+                  defaultValue: true,
+                },
+                {
+                  name: 'noimageindex',
+                  type: 'checkbox',
+                  label: 'Do not index images',
+                  defaultValue: false,
+                },
+              ],
+            },
+            {
+              name: 'social',
+              type: 'group',
+              label: 'Social Media',
+              fields: [
+                {
+                  name: 'twitter',
+                  type: 'group',
+                  label: 'Twitter',
+                  fields: [
+                    {
+                      name: 'card',
+                      type: 'select',
+                      label: 'Card type',
+                      options: [
+                        { label: 'Summary', value: 'summary' },
+                        { label: 'Summary with large image', value: 'summary_large_image' },
+                        { label: 'App', value: 'app' },
+                        { label: 'Player', value: 'player' },
+                      ],
+                      defaultValue: 'summary_large_image',
+                    },
+                    {
+                      name: 'creator',
+                      type: 'text',
+                      label: 'Creator @username',
+                    },
+                  ],
+                },
+                {
+                  name: 'og',
+                  type: 'group',
+                  label: 'Open Graph',
+                  fields: [
+                    {
+                      name: 'type',
+                      type: 'select',
+                      label: 'Content type',
+                      options: [
+                        { label: 'Website', value: 'website' },
+                        { label: 'Article', value: 'article' },
+                        { label: 'Profile', value: 'profile' },
+                        { label: 'Book', value: 'book' },
+                      ],
+                      defaultValue: 'article',
+                    },
+                    {
+                      name: 'siteName',
+                      type: 'text',
+                      label: 'Site name',
+                    },
+                    {
+                      name: 'publishedTime',
+                      type: 'date',
+                      label: 'Publication date',
+                      admin: {
+                        date: {
+                          pickerAppearance: 'dayAndTime',
+                        },
+                      },
+                    },
+                    {
+                      name: 'modifiedTime',
+                      type: 'date',
+                      label: 'Modification date',
+                      admin: {
+                        date: {
+                          pickerAppearance: 'dayAndTime',
+                        },
+                      },
+                    },
+                    {
+                      name: 'author',
+                      type: 'text',
+                      label: 'Author',
+                    },
+                    {
+                      name: 'section',
+                      type: 'text',
+                      label: 'Section',
+                    },
+                    {
+                      name: 'tag',
+                      type: 'text',
+                      label: 'Tags',
+                      admin: {
+                        description: 'Separate tags with commas',
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
             PreviewField({
-              // if the `generateUrl` function is configured
               hasGenerateFn: true,
-
-              // field paths to match the target field for data
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
             }),

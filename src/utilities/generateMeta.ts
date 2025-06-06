@@ -1,22 +1,14 @@
-import type { Metadata } from 'next'
+import { Metadata } from 'next'
+import { Page, Post } from '@/payload-types'
+import { getImageURL } from './getImageURL'
 
-import type { Media, Page, Post, Config } from '../payload-types'
-
-import { mergeOpenGraph } from './mergeOpenGraph'
-import { getServerSideURL } from './getURL'
-
-const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
-  const serverUrl = getServerSideURL()
-
-  let url = serverUrl + '/website-template-OG.webp'
-
-  if (image && typeof image === 'object' && 'url' in image) {
-    const ogUrl = image.sizes?.og?.url
-
-    url = ogUrl ? serverUrl + ogUrl : serverUrl + image.url
+const mergeOpenGraph = (og: any) => {
+  return {
+    ...og,
+    type: og.type || 'website',
+    siteName: og.siteName || 'Payload Website Template',
+    locale: 'en_US',
   }
-
-  return url
 }
 
 export const generateMeta = async (args: {
@@ -25,25 +17,61 @@ export const generateMeta = async (args: {
   const { doc } = args
 
   const ogImage = getImageURL(doc?.meta?.image)
-
   const title = doc?.meta?.title
     ? doc?.meta?.title + ' | Payload Website Template'
     : 'Payload Website Template'
 
-  return {
-    description: doc?.meta?.description,
-    openGraph: mergeOpenGraph({
-      description: doc?.meta?.description || '',
-      images: ogImage
-        ? [
-            {
-              url: ogImage,
-            },
-          ]
-        : undefined,
-      title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
-    }),
+  // Build robots directives
+  const robots = doc?.meta?.robots
+    ? {
+        index: doc.meta.robots.index ?? true,
+        follow: doc.meta.robots.follow ?? true,
+        nocache: false,
+        googleBot: {
+          index: doc.meta.robots.index ?? true,
+          follow: doc.meta.robots.follow ?? true,
+          noimageindex: doc.meta.robots.noImageIndex ?? false,
+        },
+      }
+    : undefined
+
+  // Build Twitter metadata
+  const twitter = doc?.meta?.social
+    ? {
+        card: doc.meta.social.twitterCard || 'summary_large_image',
+        title,
+        description: doc?.meta?.description || '',
+        images: ogImage ? [ogImage] : undefined,
+      }
+    : undefined
+
+  // Build Open Graph metadata
+  const openGraph = mergeOpenGraph({
     title,
+    description: doc?.meta?.description || '',
+    url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+    type: doc?.meta?.social?.ogType || 'website',
+    siteName: doc?.meta?.social?.ogSiteName,
+    publishedTime: doc?.meta?.social?.ogPublishedTime,
+    modifiedTime: doc?.meta?.social?.ogModifiedTime,
+    authors: doc?.meta?.social?.ogAuthor ? [doc.meta.social.ogAuthor] : undefined,
+    section: doc?.meta?.social?.ogSection,
+    tags: doc?.meta?.social?.ogTags,
+    images: ogImage
+      ? [
+          {
+            url: ogImage,
+          },
+        ]
+      : undefined,
+  })
+
+  return {
+    title,
+    description: doc?.meta?.description || '',
+    keywords: doc?.meta?.keywords,
+    robots,
+    twitter,
+    openGraph,
   }
 }
