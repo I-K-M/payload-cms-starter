@@ -22,6 +22,7 @@
   "dependencies": {
     "@payloadcms/admin-bar": "3.39.1",
     "@payloadcms/db-mongodb": "3.39.1",
+    "@payloadcms/email-nodemailer": "^3.41.0",
     "@payloadcms/live-preview-react": "3.39.1",
     "@payloadcms/next": "3.39.1",
     "@payloadcms/payload-cloud": "3.39.1",
@@ -45,6 +46,7 @@
     "lucide-react": "^0.378.0",
     "next": "15.3.0",
     "next-sitemap": "^4.2.3",
+    "nodemailer": "^7.0.3",
     "payload": "3.39.1",
     "prism-react-renderer": "^2.3.1",
     "react": "19.1.0",

@@ -1,25 +1,36 @@
 import { Metadata } from 'next'
 import { Page, Post } from '@/payload-types'
 import { getImageURL } from './getImageURL'
+import { getServerSideURL } from './getURL'
+import { generateJSONLD } from './generateJSONLD'
+import { siteConfig } from '@/config/site'
 
-const mergeOpenGraph = (og: any) => {
-  return {
+type OpenGraphType = 'website' | 'article' | 'profile' | 'book'
+
+const mergeOpenGraph = (og: Partial<Metadata['openGraph']>) => {
+  const baseOg = {
     ...og,
-    type: og.type || 'website',
-    siteName: og.siteName || 'Payload Website Template',
-    locale: 'en_US',
+    siteName: siteConfig.name,
+    locale: siteConfig.defaultLocale,
+  } as NonNullable<Metadata['openGraph']>
+
+  if ('type' in baseOg) {
+    baseOg.type = (baseOg.type as OpenGraphType) || 'website'
   }
+
+  return baseOg
 }
 
 export const generateMeta = async (args: {
   doc: Partial<Page> | Partial<Post> | null
+  type?: 'page' | 'post'
 }): Promise<Metadata> => {
-  const { doc } = args
+  const { doc, type = 'page' } = args
 
+  const baseURL = getServerSideURL()
+  const url = `${baseURL}${Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/'}`
   const ogImage = getImageURL(doc?.meta?.image)
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | Payload Website Template'
-    : 'Payload Website Template'
+  const title = doc?.meta?.title ? doc?.meta?.title + ` | ${siteConfig.name}` : siteConfig.name
 
   // Build robots directives
   const robots = doc?.meta?.robots
@@ -30,18 +41,19 @@ export const generateMeta = async (args: {
         googleBot: {
           index: doc.meta.robots.index ?? true,
           follow: doc.meta.robots.follow ?? true,
-          noimageindex: doc.meta.robots.noImageIndex ?? false,
+          noimageindex: doc.meta.robots.noimageindex ?? false,
         },
       }
     : undefined
 
   // Build Twitter metadata
-  const twitter = doc?.meta?.social
+  const twitter = doc?.meta?.social?.twitter
     ? {
-        card: doc.meta.social.twitterCard || 'summary_large_image',
+        card: doc.meta.social.twitter.card || 'summary_large_image',
         title,
         description: doc?.meta?.description || '',
         images: ogImage ? [ogImage] : undefined,
+        creator: siteConfig.creator,
       }
     : undefined
 
@@ -49,14 +61,14 @@ export const generateMeta = async (args: {
   const openGraph = mergeOpenGraph({
     title,
     description: doc?.meta?.description || '',
-    url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
-    type: doc?.meta?.social?.ogType || 'website',
-    siteName: doc?.meta?.social?.ogSiteName,
-    publishedTime: doc?.meta?.social?.ogPublishedTime,
-    modifiedTime: doc?.meta?.social?.ogModifiedTime,
-    authors: doc?.meta?.social?.ogAuthor ? [doc.meta.social.ogAuthor] : undefined,
-    section: doc?.meta?.social?.ogSection,
-    tags: doc?.meta?.social?.ogTags,
+    url,
+    type: (doc?.meta?.social?.og?.type as OpenGraphType) || 'website',
+    siteName: siteConfig.name,
+    publishedTime: doc?.publishedAt || doc?.createdAt,
+    modifiedTime: doc?.updatedAt,
+    authors: doc?.meta?.social?.og?.author ? [doc.meta.social.og.author] : undefined,
+    section: doc?.meta?.social?.og?.section,
+    tags: doc?.meta?.social?.og?.tags?.map((tag) => tag.tag).filter(Boolean) as string[],
     images: ogImage
       ? [
           {
@@ -66,6 +78,9 @@ export const generateMeta = async (args: {
       : undefined,
   })
 
+  // Generate JSON-LD
+  const jsonLD = generateJSONLD({ doc, type })
+
   return {
     title,
     description: doc?.meta?.description || '',
@@ -73,5 +88,11 @@ export const generateMeta = async (args: {
     robots,
     twitter,
     openGraph,
+    alternates: {
+      canonical: url,
+    },
+    other: {
+      'application/ld+json': JSON.stringify(jsonLD),
+    },
   }
 }

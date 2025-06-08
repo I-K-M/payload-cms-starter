@@ -215,7 +215,14 @@ export interface Page {
       };
       og?: {
         type?: ('website' | 'article' | 'profile' | 'book') | null;
-        siteName?: string | null;
+        author?: string | null;
+        section?: string | null;
+        tags?:
+          | {
+              tag?: string | null;
+              id?: string | null;
+            }[]
+          | null;
       };
     };
   };
@@ -274,15 +281,14 @@ export interface Post {
       };
       og?: {
         type?: ('website' | 'article' | 'profile' | 'book') | null;
-        siteName?: string | null;
-        publishedTime?: string | null;
-        modifiedTime?: string | null;
         author?: string | null;
         section?: string | null;
-        /**
-         * Separate tags with commas
-         */
-        tag?: string | null;
+        tags?:
+          | {
+              tag?: string | null;
+              id?: string | null;
+            }[]
+          | null;
       };
     };
   };
@@ -1093,7 +1099,14 @@ export interface PagesSelect<T extends boolean = true> {
                 | T
                 | {
                     type?: T;
-                    siteName?: T;
+                    author?: T;
+                    section?: T;
+                    tags?:
+                      | T
+                      | {
+                          tag?: T;
+                          id?: T;
+                        };
                   };
             };
       };
@@ -1225,12 +1238,14 @@ export interface PostsSelect<T extends boolean = true> {
                 | T
                 | {
                     type?: T;
-                    siteName?: T;
-                    publishedTime?: T;
-                    modifiedTime?: T;
                     author?: T;
                     section?: T;
-                    tag?: T;
+                    tags?:
+                      | T
+                      | {
+                          tag?: T;
+                          id?: T;
+                        };
                   };
             };
       };

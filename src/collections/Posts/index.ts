@@ -197,10 +197,10 @@ export const Posts: CollectionConfig<'posts'> = {
                     {
                       name: 'card',
                       type: 'select',
-                      label: 'Card type',
+                      label: 'Card Type',
                       options: [
                         { label: 'Summary', value: 'summary' },
-                        { label: 'Summary with large image', value: 'summary_large_image' },
+                        { label: 'Summary Large Image', value: 'summary_large_image' },
                         { label: 'App', value: 'app' },
                         { label: 'Player', value: 'player' },
                       ],
@@ -209,7 +209,7 @@ export const Posts: CollectionConfig<'posts'> = {
                     {
                       name: 'creator',
                       type: 'text',
-                      label: 'Creator @username',
+                      label: 'Twitter Handle',
                     },
                   ],
                 },
@@ -221,7 +221,7 @@ export const Posts: CollectionConfig<'posts'> = {
                     {
                       name: 'type',
                       type: 'select',
-                      label: 'Content type',
+                      label: 'Type',
                       options: [
                         { label: 'Website', value: 'website' },
                         { label: 'Article', value: 'article' },
@@ -229,31 +229,6 @@ export const Posts: CollectionConfig<'posts'> = {
                         { label: 'Book', value: 'book' },
                       ],
                       defaultValue: 'article',
-                    },
-                    {
-                      name: 'siteName',
-                      type: 'text',
-                      label: 'Site name',
-                    },
-                    {
-                      name: 'publishedTime',
-                      type: 'date',
-                      label: 'Publication date',
-                      admin: {
-                        date: {
-                          pickerAppearance: 'dayAndTime',
-                        },
-                      },
-                    },
-                    {
-                      name: 'modifiedTime',
-                      type: 'date',
-                      label: 'Modification date',
-                      admin: {
-                        date: {
-                          pickerAppearance: 'dayAndTime',
-                        },
-                      },
                     },
                     {
                       name: 'author',
@@ -266,12 +241,15 @@ export const Posts: CollectionConfig<'posts'> = {
                       label: 'Section',
                     },
                     {
-                      name: 'tag',
-                      type: 'text',
+                      name: 'tags',
+                      type: 'array',
                       label: 'Tags',
-                      admin: {
-                        description: 'Separate tags with commas',
-                      },
+                      fields: [
+                        {
+                          name: 'tag',
+                          type: 'text',
+                        },
+                      ],
                     },
                   ],
                 },

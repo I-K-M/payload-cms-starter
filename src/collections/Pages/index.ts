@@ -146,10 +146,10 @@ export const Pages: CollectionConfig<'pages'> = {
                     {
                       name: 'card',
                       type: 'select',
-                      label: 'Card type',
+                      label: 'Card Type',
                       options: [
                         { label: 'Summary', value: 'summary' },
-                        { label: 'Summary with large image', value: 'summary_large_image' },
+                        { label: 'Summary Large Image', value: 'summary_large_image' },
                         { label: 'App', value: 'app' },
                         { label: 'Player', value: 'player' },
                       ],
@@ -158,7 +158,7 @@ export const Pages: CollectionConfig<'pages'> = {
                     {
                       name: 'creator',
                       type: 'text',
-                      label: 'Creator @username',
+                      label: 'Twitter Handle',
                     },
                   ],
                 },
@@ -170,7 +170,7 @@ export const Pages: CollectionConfig<'pages'> = {
                     {
                       name: 'type',
                       type: 'select',
-                      label: 'Content type',
+                      label: 'Type',
                       options: [
                         { label: 'Website', value: 'website' },
                         { label: 'Article', value: 'article' },
@@ -180,9 +180,25 @@ export const Pages: CollectionConfig<'pages'> = {
                       defaultValue: 'website',
                     },
                     {
-                      name: 'siteName',
+                      name: 'author',
                       type: 'text',
-                      label: 'Site name',
+                      label: 'Author',
+                    },
+                    {
+                      name: 'section',
+                      type: 'text',
+                      label: 'Section',
+                    },
+                    {
+                      name: 'tags',
+                      type: 'array',
+                      label: 'Tags',
+                      fields: [
+                        {
+                          name: 'tag',
+                          type: 'text',
+                        },
+                      ],
                     },
                   ],
                 },
@@ -214,7 +230,7 @@ export const Pages: CollectionConfig<'pages'> = {
   versions: {
     drafts: {
       autosave: {
-        interval: 100, // We set this interval for optimal live preview
+        interval: 100,
       },
       schedulePublish: true,
     },
