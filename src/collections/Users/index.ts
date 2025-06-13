@@ -1,8 +1,10 @@
 import type { CollectionConfig } from 'payload'
 
 import { hasRole } from '@/access/hasRole'
+import { userActivityLogger } from '@/hooks/userActivityLogger'
+import { loginLogger } from '@/hooks/loginLogger'
 
-export const Users: CollectionConfig = {
+const Users: CollectionConfig = {
   slug: 'users',
   access: {
     create: () => true,
@@ -55,4 +57,11 @@ export const Users: CollectionConfig = {
     },
   ],
   timestamps: true,
+  hooks: {
+    afterChange: [...userActivityLogger.afterChange],
+    afterDelete: [...userActivityLogger.afterDelete],
+    afterLogin: loginLogger.afterLogin,
+  },
 }
+
+export { Users }
